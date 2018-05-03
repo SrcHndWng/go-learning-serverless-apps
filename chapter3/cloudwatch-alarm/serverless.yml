@@ -1,0 +1,185 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: cloudwatch-alarm # NOTE: update this with your service name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: go1.x
+
+# you can overwrite defaults here
+  stage: dev
+  region: ap-northeast-1
+  role: IAMRole
+
+# you can add statements to the Lambda function's IAM Role here
+#  iamRoleStatements:
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:ListBucket"
+#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:PutObject"
+#      Resource:
+#        Fn::Join:
+#          - ""
+#          - - "arn:aws:s3:::"
+#            - "Ref" : "ServerlessDeploymentBucket"
+#            - "/*"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+package:
+ exclude:
+   - ./**
+ include:
+   - ./bin/**
+
+functions:
+  reshardingFunction:
+    handler: bin/main
+    name: ${self:service}-lambda
+    events:
+      - sns:
+          arn:
+            Fn::Join: ["", [ "arn:aws:sns:", { "Ref": "AWS::Region" }, ':', { Ref: "AWS::AccountId" }, ":cloudwatch-alarm-sample-topic" ]]
+          topicName: cloudwatch-alarm-sample-topic
+
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - http:
+#          path: users/create
+#          method: get
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill
+#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+#      - cloudwatchLog: '/aws/lambda/hello'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    KinesisStream:
+      Type: "AWS::Kinesis::Stream"
+      Properties: 
+        Name: cloudwatch-alarm-sample-stream
+        ShardCount: 1
+    SnsTopic:
+      Type: "AWS::SNS::Topic"
+      Properties: 
+        DisplayName: cloudwatch-alarm-sample-sns
+        TopicName: cloudwatch-alarm-sample-topic
+        Subscription: 
+          - 
+            Endpoint:
+              Fn::Join: ["", [ "arn:aws:lambda:", { "Ref": "AWS::Region" }, ':', { Ref: "AWS::AccountId" }, ":function:${self:service}-lambda" ]]
+            Protocol: lambda
+    CloudWatchalarm:
+      Type: "AWS::CloudWatch::Alarm"
+      Properties:
+        AlarmName: cloudwatch-alarm-sample-kinesis-mon
+        MetricName: IncomingRecords
+        Namespace: AWS/Kinesis
+        Statistic: Sum
+        Period: 60
+        Threshold: 10
+        ComparisonOperator: GreaterThanThreshold
+        Dimensions:
+          - Name: StreamName
+            Value:
+              Ref: "KinesisStream"
+        EvaluationPeriods: 1
+        AlarmActions:
+          - Ref: "SnsTopic"
+    IAMRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        AssumeRolePolicyDocument:
+          Statement: 
+            -
+              Effect: "Allow"
+              Principal:
+                Service:
+                  - "lambda.amazonaws.com"
+              Action:
+                - "sts:AssumeRole"
+    IAMPolicy:
+      Type: "AWS::IAM::Policy"
+      Properties:
+        PolicyName: IAMPolicy
+        Roles:
+          - Ref: IAMRole
+        PolicyDocument:
+          Statement:
+            -
+              Effect: "Allow"
+              Resource:
+                - "*"
+              Action:
+                - "cloudwatch:*"
+                - "logs:*"
+                - "kinesis:*"
+  Outputs:
+    KinesisStreamInfo:
+      Description: Information about the KinesisStream
+      Value: 
+        Ref: "KinesisStream"
+    SnsTopicInfo:
+      Description: Information about the SnsTopic
+      Value:
+        Ref: "SnsTopic"
+    CloudWatchalarmInfo:
+      Description: Information about the CloudWatchalarm
+      Value:
+        Ref: "CloudWatchalarm"
+    IAMRoleInfo:
+      Description: Information about the IAMRole
+      Value:
+        Ref: "IAMRole"
+    IAMPolicyInfo:
+      Description: Information about the IAMPolicy
+      Value:
+        Ref: "IAMPolicy"
+    LambdaInfo:
+      Description: Information about the Lambda
+      Value:
+        Fn::Join: ["", [ "arn:aws:lambda:", { "Ref": "AWS::Region" }, ':', { Ref: "AWS::AccountId" }, ":function:${self:service}-lambda" ]]
