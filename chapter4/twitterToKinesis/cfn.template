@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description:
+  Twitter Data To Kinesis
+Parameters:
+  BinaryBucket:
+    Type: String
+    Default: ""
+    Description: Binary Bucket, Folder.
+  BinaryName:
+    Type: String
+    Default: "twitterToKinesis"
+    Description: Application Binary Name.
+  LogName:
+    Type: String
+    Default: "twitterToKinesis.log"
+    Description: LogFile Name.
+  ImageId:
+    Type: String
+    Default: "ami-28ddc154"
+  KeyName:
+    Type: String
+    Default: ""
+    Description: EC2 Key Pair Name.
+  TwitterConsumerKey:
+    Type: String
+    Default: ""
+  TwitterConsumerSecret:
+    Type: String
+    Default: ""
+  TwitterAccessToken:
+    Type: String
+    Default: ""
+  TwitterAccessTokenSecret:
+    Type: String
+    Default: ""      
+Resources:
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties: 
+      Name: twitter-to-kinesis-stream
+      ShardCount: 1
+  RootRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement: 
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - 
+          PolicyName: "root"
+          PolicyDocument:
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "s3:Get*"
+                  - "s3:List*"
+                Resource: 
+                  Fn::Join: ["", ["arn:aws:s3:::", {"Ref": "BinaryBucket"},  "/*"]]
+  RootInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles: 
+        -
+          Ref: "RootRole"
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Ref: "ImageId"
+      InstanceType: "t2.micro"
+      KeyName: 
+        Ref: "KeyName"
+      IamInstanceProfile:
+        Ref: "RootInstanceProfile"
+      UserData:
+        Fn::Base64:
+          Fn::Join: [
+              "",
+              [
+                  "#!/bin/bash\n",
+                  "aws s3 cp s3://", {"Ref" : "BinaryBucket"}, "/", {"Ref" : "BinaryName"}, " ", "/home/ec2-user/", {"Ref" : "BinaryName"}, "\n",
+                  "cd /home/ec2-user/\n",
+                  "sudo chmod +x ", {"Ref" : "BinaryName"}, "\n",
+                  "su ec2-user", "\n",
+                  "export TWITTER_CONSUMER_KEY=",  {"Ref" : "TwitterConsumerKey"}, "\n",
+                  "export TWITTER_CONSUMER_SECRET=",  {"Ref" : "TwitterConsumerSecret"}, "\n",
+                  "export TWITTER_ACCESS_TOKEN=",  {"Ref" : "TwitterAccessToken"}, "\n",
+                  "export TWITTER_ACCESS_TOKEN_SECRET=",  {"Ref" : "TwitterAccessTokenSecret"}, "\n",
+                  "./", {"Ref" : "BinaryName"}, " >> ", {"Ref" : "LogName"}, "\n"
+              ]
+          ]
+Outputs:
+  KinesisStreamInfo:
+    Description: Information about the KinesisStream
+    Value: 
+      Ref: KinesisStream
