@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
@@ -28,7 +29,10 @@ func main() {
 		switch tweet := x.(type) {
 		case anaconda.Tweet:
 			fmt.Println("-----------")
-			putRecord(k, tweet.Text)
+			err := putRecord(k, tweet)
+			if err != nil {
+				fmt.Printf("error raise. %#v\n", err)
+			}
 		case anaconda.StatusDeletionNotice:
 			// pass
 		default:
@@ -37,10 +41,14 @@ func main() {
 	}
 }
 
-func putRecord(k *kinesis.Kinesis, text string) error {
-	fmt.Println(text)
+func putRecord(k *kinesis.Kinesis, tweet anaconda.Tweet) error {
+	fmt.Println(tweet.Text)
+	bytes, err := json.Marshal(&tweet)
+	if err != nil {
+		return err
+	}
 	record := &kinesis.PutRecordInput{
-		Data:         []byte(text),
+		Data:         bytes,
 		PartitionKey: aws.String("filter"),
 		StreamName:   aws.String("twitter-to-kinesis-stream"),
 	}
@@ -65,12 +73,4 @@ func createTwitterAPI() *anaconda.TwitterApi {
 	anaconda.SetConsumerKey(consumerKey)
 	anaconda.SetConsumerSecret(consumerSecret)
 	return anaconda.NewTwitterApi(accessToken, accessTokenSecret)
-}
-
-func getAccessKeys() (consumerKey string, consumerSecret string, accessToken string, accessTokenSecret string) {
-	consumerKey = os.Getenv("TWITTER_CONSUMER_KEY")
-	consumerSecret = os.Getenv("TWITTER_CONSUMER_SECRET")
-	accessToken = os.Getenv("TWITTER_ACCESS_TOKEN")
-	accessTokenSecret = os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
-	return
 }

@@ -63,6 +63,11 @@ Resources:
                   - "s3:List*"
                 Resource: 
                   Fn::Join: ["", ["arn:aws:s3:::", {"Ref": "BinaryBucket"},  "/*"]]
+              -
+                Effect: "Allow"
+                Action:
+                  - kinesis:PutRecord
+                Resource: arn:aws:kinesis:ap-northeast-1:*:*
   RootInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:

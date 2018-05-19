@@ -6,7 +6,18 @@ Serverless Frameworkは使用せず、CloudFormationにてKinesis、EC2とアプ
 
 # Quick Start
 
-1. CloudFormation
+1. S3 Bucket
+
+S3のBucketを用意し、ビルドして作成したバイナリを配置する。
+Bucket名、バイナリ名はCloudFormation実行時に指定する。
+
+バイナリは以下のコマンドでEC2で実行できる形式とすること。
+
+```
+$ GOOS=linux go build
+```
+
+2. CloudFormation
 
 cfn.templateをテンプレートとしてCloudFormationを実行する。
 
