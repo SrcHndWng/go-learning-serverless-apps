@@ -14,5 +14,5 @@ GOOS=linux go build -o bin/main
 2. Deploy!
 
 ```
-serverless deploy
+serverless deploy --account 9999999999(Your AWS Account Number)
 ```

@@ -120,6 +120,72 @@ resources:
                       Ref: "S3Bucket"
                     - "/*"
               Principal: "*"
+    DynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: picture-post-photos
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    RootRole: 
+      Type: "AWS::IAM::Role"
+      Properties: 
+        AssumeRolePolicyDocument: 
+          Version: "2012-10-17"
+          Statement: 
+            - 
+              Effect: "Allow"
+              Principal: 
+                Service: 
+                  - "lambda.amazonaws.com"
+              Action: 
+                - "sts:AssumeRole"
+        Path: "/"
+    RolePolicies: 
+      Type: "AWS::IAM::Policy"
+      Properties: 
+        PolicyName: "root"
+        PolicyDocument: 
+          Version: "2012-10-17"
+          Statement: 
+            - 
+              Effect: "Allow"
+              Action:
+                - dynamodb:Query
+                - dynamodb:Scan
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+              Resource: arn:aws:dynamodb:ap-northeast-1:${opt:account}:table/picture-post-photos
+            -
+              Effect: "Allow"
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: arn:aws:logs:ap-northeast-1:*:*
+            -
+              Effect: "Allow"
+              Action:
+                - s3:PutObject
+              Resource: arn:aws:s3:::picture-post-web-site
+        Roles: 
+          - 
+            Ref: "RootRole"
+    RootInstanceProfile: 
+      Type: "AWS::IAM::InstanceProfile"
+      Properties: 
+        Path: "/"
+        Roles: 
+          - 
+            Ref: "RootRole"
   Outputs:
     OutputS3Bucket:
       Value:
