@@ -92,6 +92,7 @@ functions:
 # you can add CloudFormation resource templates here
 resources:
   Resources:
+    # 静的ファイルの配信用バケット
     S3Bucket:
       Type: "AWS::S3::Bucket"
       Properties:
@@ -120,6 +121,36 @@ resources:
                       Ref: "S3Bucket"
                     - "/*"
               Principal: "*"
+    # 写真画像の保存先となるバケット
+    S3BucketPhotos:
+      Type: "AWS::S3::Bucket"
+      Properties:
+        BucketName: picture-post-photos
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
+      DeletionPolicy: Retain
+    BucketPhotosPolicy: 
+      Type: "AWS::S3::BucketPolicy"
+      Properties: 
+        Bucket: 
+          Ref: "S3BucketPhotos"
+        PolicyDocument: 
+          Statement: 
+            - 
+              Action: 
+                - "s3:GetObject"
+              Effect: "Allow"
+              Resource: 
+                Fn::Join: 
+                  - ""
+                  - 
+                    - "arn:aws:s3:::"
+                    - 
+                      Ref: "S3BucketPhotos"
+                    - "/*"
+              Principal: "*"
+    # DynamoDB
     DynamoDbTable:
       Type: AWS::DynamoDB::Table
       Properties:
