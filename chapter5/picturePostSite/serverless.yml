@@ -53,8 +53,12 @@ package:
    - ./bin/**
 
 functions:
-  hello:
-    handler: bin/main
+  postImages:
+    handler: bin/images/post
+    events:
+      - http:
+          path: images
+          method: post
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

@@ -8,7 +8,7 @@
 
 ```
 cd picturePostSite/
-GOOS=linux go build -o bin/main
+make
 ```
 
 2. Deploy!
