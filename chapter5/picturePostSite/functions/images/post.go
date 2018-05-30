@@ -25,7 +25,8 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return utils.ErrorResponse(err)
 	}
 
-	fmt.Println(body)
+	photoID := utils.GenerateID()
+	fmt.Println("photoID = " + photoID)
 
 	return events.APIGatewayProxyResponse{Body: "Images Post Success.\n", StatusCode: 200}, nil
 }
