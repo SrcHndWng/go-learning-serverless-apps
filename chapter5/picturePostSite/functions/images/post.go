@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/SrcHndWng/go-learning-serverless-apps/chapter5/picturePostSite/functions/utils"
 	"github.com/aws/aws-lambda-go/events"
@@ -26,7 +27,13 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 
 	photoID := utils.GenerateID()
-	fmt.Println("photoID = " + photoID)
+	bucket := os.Getenv("BUCKET_NAME")
+	url, err := utils.GetPresignedURL(bucket, photoID, body.Type)
+	if err != nil {
+		return utils.ErrorResponse(err)
+	}
+
+	fmt.Printf("pre signed url = %s\n", url)
 
 	return events.APIGatewayProxyResponse{Body: "Images Post Success.\n", StatusCode: 200}, nil
 }
