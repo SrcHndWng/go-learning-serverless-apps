@@ -41,25 +41,28 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	fmt.Println("Received body: ", request.Body)
 
 	var body Body
-	err := json.Unmarshal([]byte(request.Body), &body)
-	if err != nil {
+	if err := json.Unmarshal([]byte(request.Body), &body); err != nil {
 		return utils.ErrorResponse(err)
 	}
 
 	photoID := utils.GenerateID()
 	bucket := os.Getenv("BUCKET_NAME")
+
 	url, err := utils.GetPresignedURL(bucket, photoID, body.Type)
 	if err != nil {
 		return utils.ErrorResponse(err)
 	}
 
 	item := Item{ID: photoID, Timestamp: nowDateTime(), Status: "Waiting", Type: body.Type, Size: body.Size, SignedURL: url}
-	err = register(item)
-	if err != nil {
+	if err = register(item); err != nil {
 		return utils.ErrorResponse(err)
 	}
 
-	return events.APIGatewayProxyResponse{Body: "Images Post Success.\n", StatusCode: 200}, nil
+	jsonItem, err := json.Marshal(item)
+	if err != nil {
+		return utils.ErrorResponse(err)
+	}
+	return utils.SuccessResponse(string(jsonItem))
 }
 
 func main() {
