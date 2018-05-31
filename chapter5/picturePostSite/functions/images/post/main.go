@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/SrcHndWng/go-learning-serverless-apps/chapter5/picturePostSite/functions/models"
 	"github.com/SrcHndWng/go-learning-serverless-apps/chapter5/picturePostSite/functions/utils"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -17,23 +18,8 @@ type Body struct {
 	Size int    `json:"size"`
 }
 
-// Item contains data to register to dynamoDB.
-type Item struct {
-	ID        string `json:"id"`
-	Timestamp int64  `json:"timestamp"`
-	Status    string `json:"status"`
-	Type      string `json:"type"`
-	Size      int    `json:"size"`
-	SignedURL string `json:"signed_url"`
-}
-
 func timestamp() int64 {
 	return time.Now().Unix()
-}
-
-func register(item Item) error {
-	tbl := utils.Table(os.Getenv("TABLE_NAME"))
-	return tbl.Put(item).Run()
 }
 
 // Handler gets Image post requests.
@@ -48,13 +34,13 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	photoID := utils.GenerateID()
 	bucket := os.Getenv("BUCKET_NAME")
 
-	url, err := utils.GetPresignedURL(bucket, photoID, body.Type)
+	url, err := getPresignedURL(bucket, photoID, body.Type)
 	if err != nil {
 		return utils.ErrorResponse(err)
 	}
 
-	item := Item{ID: photoID, Timestamp: timestamp(), Status: "Waiting", Type: body.Type, Size: body.Size, SignedURL: url}
-	if err = register(item); err != nil {
+	item := models.Item{ID: photoID, Timestamp: timestamp(), Status: "Waiting", Type: body.Type, Size: body.Size, SignedURL: url}
+	if err = models.SaveItem(item); err != nil {
 		return utils.ErrorResponse(err)
 	}
 

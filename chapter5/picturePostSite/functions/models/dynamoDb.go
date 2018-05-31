@@ -1,4 +1,4 @@
-package utils
+package models
 
 import (
 	"github.com/aws/aws-sdk-go/aws"

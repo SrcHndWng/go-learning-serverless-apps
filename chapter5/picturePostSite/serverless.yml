@@ -62,7 +62,7 @@ functions:
           method: post
     environment:
       BUCKET_NAME: picture-post-photos
-      TABLE_NAME: picture-post-photos
+      TABLE_NAME: picture_post_photos
   updateImages:
     handler: bin/images/update
     events:
@@ -168,7 +168,7 @@ resources:
     DynamoDbTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: picture-post-photos
+        TableName: picture_post_photos
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
@@ -209,7 +209,7 @@ resources:
                 - dynamodb:PutItem
                 - dynamodb:UpdateItem
                 - dynamodb:DeleteItem
-              Resource: arn:aws:dynamodb:ap-northeast-1:${opt:account}:table/picture-post-photos
+              Resource: arn:aws:dynamodb:ap-northeast-1:${opt:account}:table/picture_post_photos
             -
               Effect: "Allow"
               Action:

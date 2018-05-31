@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"strings"
@@ -9,8 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-// GetPresignedURL gets s3 presigned url.
-func GetPresignedURL(bucket string, photoID string, reqType string) (url string, err error) {
+func getPresignedURL(bucket string, photoID string, reqType string) (url string, err error) {
 	ext := strings.Split(reqType, "/")[1]
 	key := photoID + "." + ext
 	svc := s3.New(session.New(), aws.NewConfig().WithRegion("ap-northeast-1"))
