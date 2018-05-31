@@ -63,6 +63,12 @@ functions:
     environment:
       BUCKET_NAME: picture-post-photos
       TABLE_NAME: picture-post-photos
+  updateImages:
+    handler: bin/images/update
+    events:
+      - http:
+          path: images
+          method: put
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
