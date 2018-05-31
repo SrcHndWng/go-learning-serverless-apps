@@ -21,6 +21,7 @@ provider:
   name: aws
   runtime: go1.x
   region: ap-northeast-1
+  role: RootRole
 
 # you can overwrite defaults here
 #  stage: dev
@@ -61,6 +62,7 @@ functions:
           method: post
     environment:
       BUCKET_NAME: picture-post-photos
+      TABLE_NAME: picture-post-photos
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -170,6 +172,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
+    # Role
     RootRole: 
       Type: "AWS::IAM::Role"
       Properties: 

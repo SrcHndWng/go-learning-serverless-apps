@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/SrcHndWng/go-learning-serverless-apps/chapter5/picturePostSite/functions/utils"
 	"github.com/aws/aws-lambda-go/events"
@@ -14,6 +15,25 @@ import (
 type Body struct {
 	Type string `json:"type"`
 	Size int    `json:"size"`
+}
+
+// Item contains data to register to dynamoDB.
+type Item struct {
+	ID        string `json:"id"`
+	Timestamp string `json:"timestamp"`
+	Status    string `json:"status"`
+	Type      string `json:"type"`
+	Size      int    `json:"size"`
+	SignedURL string `json:"signed_url"`
+}
+
+func nowDateTime() string {
+	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+func register(item Item) error {
+	tbl := utils.Table(os.Getenv("TABLE_NAME"))
+	return tbl.Put(item).Run()
 }
 
 // Handler gets Image post requests.
@@ -33,7 +53,11 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return utils.ErrorResponse(err)
 	}
 
-	fmt.Printf("pre signed url = %s\n", url)
+	item := Item{ID: photoID, Timestamp: nowDateTime(), Status: "Waiting", Type: body.Type, Size: body.Size, SignedURL: url}
+	err = register(item)
+	if err != nil {
+		return utils.ErrorResponse(err)
+	}
 
 	return events.APIGatewayProxyResponse{Body: "Images Post Success.\n", StatusCode: 200}, nil
 }
