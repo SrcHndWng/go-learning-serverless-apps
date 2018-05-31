@@ -24,9 +24,15 @@ func SaveItem(item Item) error {
 
 // GetItem gets table data and return.
 func GetItem(photoID string) (item Item, err error) {
-	tbl := Table("picture_post_photos")
+	tbl := table()
 	err = tbl.Get("ID", photoID).One(&item)
 	return
+}
+
+// UpdateItem updates data.
+func UpdateItem(photoID string, timestamp int64, status string) error {
+	tbl := table()
+	return tbl.Update("ID", photoID).Set("Timestamp", timestamp).Set("Status", status).Run()
 }
 
 func table() dynamo.Table {

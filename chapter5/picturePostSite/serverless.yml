@@ -17,6 +17,10 @@ service: picturePostSite # NOTE: update this with your service name
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
 
+custom:
+  BUCKET_NAME: picture-post-photos
+  TABLE_NAME: picture_post_photos
+
 provider:
   name: aws
   runtime: go1.x
@@ -61,14 +65,16 @@ functions:
           path: images
           method: post
     environment:
-      BUCKET_NAME: picture-post-photos
-      TABLE_NAME: picture_post_photos
+      BUCKET_NAME: ${self:custom.BUCKET_NAME}
+      TABLE_NAME: ${self:custom.TABLE_NAME}
   updateImages:
     handler: bin/images/update
     events:
       - http:
           path: images
           method: put
+    environment:
+      TABLE_NAME: ${self:custom.TABLE_NAME}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

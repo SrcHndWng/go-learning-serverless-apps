@@ -26,13 +26,16 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return utils.ErrorResponse(err)
 	}
 
+	if err := models.UpdateItem(body.ID, body.Timestamp, body.Status); err != nil {
+		return utils.ErrorResponse(err)
+	}
+
 	item, err := models.GetItem(body.ID)
 	if err != nil {
 		return utils.ErrorResponse(err)
 	}
-	fmt.Printf("get item = %v\n", item)
 
-	return utils.SuccessResponse("put method success!")
+	return utils.ItemResponse(item)
 }
 
 func main() {

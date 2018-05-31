@@ -44,11 +44,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return utils.ErrorResponse(err)
 	}
 
-	jsonItem, err := json.Marshal(item)
-	if err != nil {
-		return utils.ErrorResponse(err)
-	}
-	return utils.SuccessResponse(string(jsonItem))
+	return utils.ItemResponse(item)
 }
 
 func main() {
