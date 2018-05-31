@@ -20,15 +20,15 @@ type Body struct {
 // Item contains data to register to dynamoDB.
 type Item struct {
 	ID        string `json:"id"`
-	Timestamp string `json:"timestamp"`
+	Timestamp int64  `json:"timestamp"`
 	Status    string `json:"status"`
 	Type      string `json:"type"`
 	Size      int    `json:"size"`
 	SignedURL string `json:"signed_url"`
 }
 
-func nowDateTime() string {
-	return time.Now().Format("2006-01-02 15:04:05")
+func timestamp() int64 {
+	return time.Now().Unix()
 }
 
 func register(item Item) error {
@@ -53,7 +53,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return utils.ErrorResponse(err)
 	}
 
-	item := Item{ID: photoID, Timestamp: nowDateTime(), Status: "Waiting", Type: body.Type, Size: body.Size, SignedURL: url}
+	item := Item{ID: photoID, Timestamp: timestamp(), Status: "Waiting", Type: body.Type, Size: body.Size, SignedURL: url}
 	if err = register(item); err != nil {
 		return utils.ErrorResponse(err)
 	}
