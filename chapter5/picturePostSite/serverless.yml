@@ -75,7 +75,14 @@ functions:
           method: put
     environment:
       TABLE_NAME: ${self:custom.TABLE_NAME}
-
+  getImageById:
+    handler: bin/images/id/get
+    events:
+      - http:
+          path: images/{id}
+          method: get
+    environment:
+      TABLE_NAME: ${self:custom.TABLE_NAME}
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

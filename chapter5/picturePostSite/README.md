@@ -4,15 +4,9 @@
 
 # Quick Start
 
-1. Compile function
+1. Compile functions, Deploy
 
 ```
 cd picturePostSite/
-make
-```
-
-2. Deploy!
-
-```
-serverless deploy --account 9999999999(Your AWS Account Number)
+make --account 9999999999(Your AWS Account Number)
 ```
