@@ -14,9 +14,18 @@ func ErrorResponse(err error) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{StatusCode: 500, Body: "Internal Server Error!!"}, nil
 }
 
-// ItemResponse retuns response with item data.
+// ItemResponse retuns response with one item data.
 func ItemResponse(item models.Item) (events.APIGatewayProxyResponse, error) {
 	jsonItem, err := json.Marshal(item)
+	if err != nil {
+		return ErrorResponse(err)
+	}
+	return SuccessResponse(string(jsonItem))
+}
+
+// ItemsResponse retuns response with items data.
+func ItemsResponse(items []models.Item) (events.APIGatewayProxyResponse, error) {
+	jsonItem, err := json.Marshal(items)
 	if err != nil {
 		return ErrorResponse(err)
 	}

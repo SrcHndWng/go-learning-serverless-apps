@@ -58,6 +58,14 @@ package:
    - ./bin/**
 
 functions:
+  getImages:
+    handler: bin/images/get
+    events:
+      - http:
+          path: images
+          method: get
+    environment:
+      TABLE_NAME: ${self:custom.TABLE_NAME}
   postImages:
     handler: bin/images/post
     events:

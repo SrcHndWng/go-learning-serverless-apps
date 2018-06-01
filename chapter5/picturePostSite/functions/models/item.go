@@ -35,6 +35,13 @@ func UpdateItem(photoID string, timestamp int64, status string) error {
 	return tbl.Update("ID", photoID).Set("Timestamp", timestamp).Set("Status", status).Run()
 }
 
+// GetItemsByStatus gets items by status.
+func GetItemsByStatus(status string) (items []Item, err error) {
+	tbl := table()
+	err = tbl.Scan().Filter("'Status' = ?", status).All(&items)
+	return
+}
+
 func table() dynamo.Table {
 	return Table(os.Getenv("TABLE_NAME"))
 }
