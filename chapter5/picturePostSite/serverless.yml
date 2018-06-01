@@ -91,6 +91,14 @@ functions:
           method: get
     environment:
       TABLE_NAME: ${self:custom.TABLE_NAME}
+  deleteImageById:
+    handler: bin/images/id/delete
+    events:
+      - http:
+          path: images/{id}
+          method: delete
+    environment:
+      TABLE_NAME: ${self:custom.TABLE_NAME}
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

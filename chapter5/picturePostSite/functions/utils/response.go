@@ -36,3 +36,8 @@ func ItemsResponse(items []models.Item) (events.APIGatewayProxyResponse, error) 
 func SuccessResponse(body string) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{Body: body, StatusCode: 200}, nil
 }
+
+// NoContentResponse returns no content status.
+func NoContentResponse(body string) (events.APIGatewayProxyResponse, error) {
+	return events.APIGatewayProxyResponse{Body: body, StatusCode: 204}, nil
+}

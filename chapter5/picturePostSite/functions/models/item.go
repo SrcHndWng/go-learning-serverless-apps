@@ -42,6 +42,12 @@ func GetItemsByStatus(status string) (items []Item, err error) {
 	return
 }
 
+// DeleteItem removes item.
+func DeleteItem(photoID string) error {
+	tbl := table()
+	return tbl.Delete("ID", photoID).Run()
+}
+
 func table() dynamo.Table {
 	return Table(os.Getenv("TABLE_NAME"))
 }
