@@ -9,7 +9,17 @@ import (
 
 // Handler gets item by id.
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	item, err := models.GetItem(request.PathParameters["id"])
+	photoID := request.PathParameters["id"]
+
+	count, err := models.Count(photoID)
+	if err != nil {
+		return utils.ErrorResponse(err)
+	}
+	if count == 0 {
+		return utils.NotFountResponse()
+	}
+
+	item, err := models.GetItem(photoID)
 	if err != nil {
 		return utils.ErrorResponse(err)
 	}

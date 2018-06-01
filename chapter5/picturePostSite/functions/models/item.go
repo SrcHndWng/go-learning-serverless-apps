@@ -29,6 +29,13 @@ func GetItem(photoID string) (item Item, err error) {
 	return
 }
 
+// Count gets count by id.
+func Count(photoID string) (count int64, err error) {
+	tbl := table()
+	count, err = tbl.Get("ID", photoID).Count()
+	return
+}
+
 // UpdateItem updates data.
 func UpdateItem(photoID string, timestamp int64, status string) error {
 	tbl := table()

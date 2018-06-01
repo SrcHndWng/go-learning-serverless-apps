@@ -38,6 +38,11 @@ func SuccessResponse(body string) (events.APIGatewayProxyResponse, error) {
 }
 
 // NoContentResponse returns no content status.
-func NoContentResponse(body string) (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{Body: body, StatusCode: 204}, nil
+func NoContentResponse() (events.APIGatewayProxyResponse, error) {
+	return events.APIGatewayProxyResponse{StatusCode: 204}, nil
+}
+
+// NotFountResponse return not found response.
+func NotFountResponse() (events.APIGatewayProxyResponse, error) {
+	return events.APIGatewayProxyResponse{StatusCode: 404}, nil
 }

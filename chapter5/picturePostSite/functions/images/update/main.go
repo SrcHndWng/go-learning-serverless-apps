@@ -26,6 +26,14 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return utils.ErrorResponse(err)
 	}
 
+	count, err := models.Count(body.ID)
+	if err != nil {
+		return utils.ErrorResponse(err)
+	}
+	if count == 0 {
+		return utils.NotFountResponse()
+	}
+
 	if err := models.UpdateItem(body.ID, body.Timestamp, body.Status); err != nil {
 		return utils.ErrorResponse(err)
 	}

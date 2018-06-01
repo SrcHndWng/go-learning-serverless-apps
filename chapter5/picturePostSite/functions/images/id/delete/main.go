@@ -12,11 +12,19 @@ import (
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	photoID := request.PathParameters["id"]
 
+	count, err := models.Count(photoID)
+	if err != nil {
+		return utils.ErrorResponse(err)
+	}
+	if count == 0 {
+		return utils.NotFountResponse()
+	}
+
 	if err := models.DeleteItem(photoID); err != nil {
 		return utils.ErrorResponse(err)
 	}
 
-	return utils.NoContentResponse("item deleted")
+	return utils.NoContentResponse()
 }
 
 func main() {
