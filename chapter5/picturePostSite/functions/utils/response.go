@@ -34,7 +34,12 @@ func ItemsResponse(items []models.Item) (events.APIGatewayProxyResponse, error) 
 
 // SuccessResponse returns response to API Gateway.
 func SuccessResponse(body string) (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{Body: body, StatusCode: 200}, nil
+	headers := map[string]string{
+		"Access-Control-Allow-Methods": "*",
+		"Access-Control-Allow-Headers": "*",
+		"Access-Control-Allow-Origin":  "*",
+	}
+	return events.APIGatewayProxyResponse{Headers: headers, Body: body, StatusCode: 200}, nil
 }
 
 // NoContentResponse returns no content status.

@@ -72,6 +72,7 @@ functions:
       - http:
           path: images
           method: post
+          cors: true
     environment:
       BUCKET_NAME: ${self:custom.BUCKET_NAME}
       TABLE_NAME: ${self:custom.TABLE_NAME}
@@ -81,6 +82,7 @@ functions:
       - http:
           path: images
           method: put
+          cors: true
     environment:
       TABLE_NAME: ${self:custom.TABLE_NAME}
   getImageById:
@@ -172,6 +174,20 @@ resources:
         AccessControl: PublicRead
         WebsiteConfiguration:
           IndexDocument: index.html
+        CorsConfiguration:
+          CorsRules:
+            - 
+              AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - "GET"
+                - "PUT"
+                - "DELETE"
+                - "POST"
+                - "HEAD"
+              AllowedOrigins:
+                - "*"
+              MaxAge: 3000
       DeletionPolicy: Retain
     BucketPhotosPolicy: 
       Type: "AWS::S3::BucketPolicy"
@@ -251,6 +267,16 @@ resources:
               Action:
                 - s3:PutObject
               Resource: arn:aws:s3:::picture-post-web-site
+            -
+              Effect: "Allow"
+              Action:
+                - s3:*
+              Resource: arn:aws:s3:::picture-post-photos
+            -
+              Effect: "Allow"
+              Action:
+                - s3:*
+              Resource: arn:aws:s3:::picture-post-photos/*
         Roles: 
           - 
             Ref: "RootRole"

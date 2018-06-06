@@ -6,3 +6,4 @@ MEMO.md
 */*/*/*/*/debug
 */*/*/*/*/debug.test
 chapter4/twitterToKinesis/twitterToKinesis
+chapter5/serverless-spa/src/config.js
