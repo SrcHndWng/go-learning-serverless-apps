@@ -64,6 +64,7 @@ functions:
       - http:
           path: images
           method: get
+          cors: true
     environment:
       TABLE_NAME: ${self:custom.TABLE_NAME}
   postImages:
@@ -91,6 +92,7 @@ functions:
       - http:
           path: images/{id}
           method: get
+          cors: true
     environment:
       TABLE_NAME: ${self:custom.TABLE_NAME}
   deleteImageById:
@@ -99,6 +101,7 @@ functions:
       - http:
           path: images/{id}
           method: delete
+          cors: true
     environment:
       TABLE_NAME: ${self:custom.TABLE_NAME}
 #    The following are a few example events you can configure

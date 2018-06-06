@@ -7,7 +7,7 @@
         </div>
     </div>
     <div v-for="image in images" :key="image.photo_id" class="photo pure-u-1-3 pure-u-md-1-3 pure-u-lg-1-3 pure-u-xl-1-3">
-        <img v-bind:src="image_url_base + '/' +image.photo_id + '.' + image.type.split('/')[1]">
+        <img v-bind:src="image_url_base + '/' + image.id + '.' + image.type.split('/')[1]">
     </div>
     <div class="pure-u-1 form-box" id="upload-image">
         <div class="l-box">
@@ -44,10 +44,13 @@ export default {
     //画像情報の一覧取得APIにアクセスして結果をセットする
     listImages: function() {
       var self = this;
-      var _this = this;
 
       axios.get(API_BASE_URL + "/images/").then(function(res) {
         self.$data.images = res.data;
+      })
+      .catch(function(error) {
+        alert(error);
+        console.log(error);
       });
     },
 
@@ -59,6 +62,7 @@ export default {
     uploadImage: function() {
       var file = this.uploadFile;
       var json = null;
+      var _this = this;
 
       //画像アップロード用APIを呼び出してアップロードする画像のキーやアップロード用署名付きURLを取得
       var data = { size: file.size, type: file.type };
